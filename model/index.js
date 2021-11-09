@@ -1,4 +1,4 @@
-const fs = require('fs/promise')
+const fs = require('fs/promises')
 const crypto = require('crypto')
 
 const contactsPath = require('./contactsPath')
