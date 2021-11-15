@@ -89,23 +89,19 @@ router.put('/:contactId', async (req, res, next) => {
 
 router.patch('/:contactId/favorite', async (req, res, next) => {
   try {
-    const { error } = contactsValidation.validate(req.body)
-
-    if (error) {
-      throw new BadRequest(error.message)
-    }
-
     const { contactId } = req.params
-    const updatedContact = await contacts.updateContact(contactId, req.body)
-
-    if (!updatedContact) {
-      throw new NotFound('Not found')
+    const { favorite } = req.body
+    if (favorite === undefined) {
+      return res.status(400).json({
+        message: 'missing field favorite'
+      })
     }
-
-    res.status(201).json({
-      status: 'success',
-      code: 201,
-      data: updatedContact,
+    const updatedContact = await contacts.updateContact(contactId, { favorite })
+    if (updatedContact) {
+      return res.json(updatedContact)
+    }
+    return res.status(404).json({
+      message: 'Not found',
     })
   } catch (error) {
     next(error)
