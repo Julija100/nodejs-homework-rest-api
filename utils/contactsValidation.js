@@ -7,8 +7,8 @@ const contactsValidation = Joi.object({
       minDomainSegments: 2,
       tlds: { allow: ['com', 'net'] },
     }),
-
-  phone: Joi.string().min(7).max(20)
+  phone: Joi.string().min(7).max(20),
+  favorite: Joi.boolean()
 })
 
 module.exports = contactsValidation
