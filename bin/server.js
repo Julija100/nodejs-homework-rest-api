@@ -1,9 +1,9 @@
+require('dotenv').config()
 const app = require('../app')
 const mongoose = require('mongoose')
 
-const PORT = process.env.PORT || 3000
-const DB_HOST =
-  'mongodb+srv://JuliaFaltina:t1R5Gd9SLXs4LS1Y@cluster0.luj0b.mongodb.net/db-contacts?retryWrites=true&w=majority'
+const PORT = process.env.PORT
+const DB_HOST = process.env.DB_HOST
 
 mongoose
   .connect(DB_HOST)
