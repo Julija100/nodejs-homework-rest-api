@@ -1,9 +1,8 @@
 const { Contact } = require('../model/contactsModel')
 
-const getAllContacts = require('../utils/getAllContacts')
-
-const listContacts = () => {
-  return getAllContacts()
+const getAllContacts = async () => {
+  const contacts = await Contact.find()
+  return contacts
 }
 
 const getContactById = async (contactId) => {
@@ -16,7 +15,7 @@ const getContactById = async (contactId) => {
 
 const removeContact = async (contactId) => {
   try {
-    await Contact.deleteOne({ _id: contactId })
+    await Contact.findByIdAndRemove(contactId)
   } catch (error) {
     console.error(error)
     return null
@@ -36,7 +35,7 @@ const updateContact = async (contactId, body) => {
 }
 
 module.exports = {
-  listContacts,
+  getAllContacts,
   getContactById,
   removeContact,
   addContact,

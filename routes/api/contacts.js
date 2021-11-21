@@ -7,7 +7,7 @@ const contactsValidation = require('../../utils/contactsValidation')
 
 router.get('/', async (req, res, next) => {
   try {
-    const allContacts = await contacts.listContacts()
+    const allContacts = await contacts.getAllContacts()
 
     res.json(allContacts)
   } catch (error) {
