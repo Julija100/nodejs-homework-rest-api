@@ -21,9 +21,7 @@ const authenticate = async (req, res, next) => {
       throw new Error('Not found')
     }
   } catch (error) {
-    if (error) {
-      throw new Unauthorized('Not authorized')
-    }
+    return next(new Unauthorized('Not authorized'))
   }
 }
 
