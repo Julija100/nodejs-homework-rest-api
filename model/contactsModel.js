@@ -21,7 +21,7 @@ const modelContactsSchema = Schema(
       ref: 'user',
     },
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true }
 )
 
 const Contact = model('contact', modelContactsSchema)
