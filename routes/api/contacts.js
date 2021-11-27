@@ -1,9 +1,12 @@
 const express = require('express')
 const router = express.Router()
 const { NotFound, BadRequest } = require('http-errors')
+const authenticate = require('../../utils/authenticate')
 
 const contactsValidation = require('../../utils/contactsValidation')
 const { Contact } = require('../../model/contactsModel')
+
+router.use(authenticate)
 
 router.get('/', async (req, res, next) => {
   try {
