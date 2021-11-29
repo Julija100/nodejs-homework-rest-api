@@ -119,23 +119,6 @@ router.get('/current', authenticate, async (req, res, next) => {
   }
 })
 
-// router.patch('/', authenticate, async (req, res, next) => {
-//   const { _id } = req.user
-//   const updateUser = await User.findOneAndUpdate(_id, req.body, {
-//     new: true,
-//     select: '-_id -password -token',
-//     runValidators: true,
-//   })
-//   if (!updateUser) {
-//     throw new Unauthorized('Not authorized!')
-//   }
-//   res.json({
-//     status: 'OK',
-//     code: 200,
-//     result: updateUser,
-//   })
-// })
-
 router.patch('/avatars', authenticate, uploadAvatars.single('avatar'), async (req, res, next) => {
   const { id } = req.user
   const { path: tempUpload, filename } = req.file
