@@ -1,5 +1,4 @@
 const express = require('express')
-const { ObjectId } = require('mongoose')
 const router = express.Router()
 const fs = require('fs/promises')
 const path = require('path')
@@ -25,7 +24,7 @@ router.post('/signup', async (req, res, next) => {
     }
 
     const { password, email } = req.body
-    const avatarURL = gravatar.url(email)
+    const avatarURL = gravatar.url(email, { protocol: 'http' })
     const dublicateUser = await User.findOne({ email })
 
     if (dublicateUser) {
