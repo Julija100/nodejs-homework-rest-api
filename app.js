@@ -1,11 +1,15 @@
 const express = require('express')
 const logger = require('morgan')
 const cors = require('cors')
+const authenticate = require('./utils/authenticate')
+
+require('dotenv').config()
 
 const usersRouter = require('./routes/api/users')
 const contactsRouter = require('./routes/api/contacts')
 
 const app = express()
+app.use('/static', authenticate, express.static('public'))
 
 const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short'
 
@@ -22,6 +26,7 @@ app.use((req, res) => {
 
 app.use((err, req, res, next) => {
   res.status(err.statusCode || 500).json({ message: err.message })
+  console.warn(err)
 })
 
 module.exports = app

@@ -6,9 +6,9 @@ const { JWT_KEY } = process.env
 
 const authenticate = async (req, res, next) => {
   try {
-    const [, token] = req.headers.authorization.split(' ')
     let id
     try {
+      const [, token] = req.headers.authorization.split(' ')
       id = jwt.verify(token, JWT_KEY).id
     } catch (error) {
       throw new Unauthorized('Not authorized')
