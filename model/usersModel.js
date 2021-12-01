@@ -21,6 +21,14 @@ const modelUsersSchema = Schema(
       type: String,
       default: null,
     },
+    verificationToken: {
+      type: String,
+      unique: true
+    },
+    verify: {
+      type: Boolean,
+      default: false,
+    },
   },
   { versionKey: false, timestamps: true }
 )
