@@ -1,4 +1,4 @@
-const { Unauthorized, NotFound } = require('http-errors')
+const { Unauthorized, NotFound, Forbidden } = require('http-errors')
 const jwt = require('jsonwebtoken')
 
 const { User } = require('../model/usersModel')
@@ -17,6 +17,10 @@ const authenticate = async (req, res, next) => {
     const user = await User.findById(id)
     if (!user) {
       throw new NotFound('User not found')
+    }
+
+    if (!user.verify) {
+      throw new Forbidden('User not verified')
     }
 
     req.user = user

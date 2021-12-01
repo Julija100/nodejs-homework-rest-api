@@ -7,6 +7,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const gravatar = require('gravatar')
 const Jimp = require('jimp')
+const { v4 } = require('uuid')
 
 const { JWT_KEY } = process.env
 const uploadAvatars = require('../../utils/uploadAvatars')
@@ -14,6 +15,15 @@ const { User } = require('../../model/usersModel')
 const authenticate = require('../../utils/authenticate')
 const usersValidation = require('../../utils/usersValidation')
 const avatarsDir = path.join(__dirname, '../../public/avatars')
+const { sendEmail } = require('../../utils/sendEmail')
+
+const sendVerificationEmail = async ({ email, verificationToken }) => {
+  await sendEmail({
+    to: email,
+    subject: 'Email verification',
+    html: `<a href="${process.env.WEBSITE_URL}/api/users/verify/${encodeURIComponent(verificationToken)}">Click here to verify email</a>`
+  })
+}
 
 router.post('/signup', async (req, res, next) => {
   try {
@@ -28,13 +38,19 @@ router.post('/signup', async (req, res, next) => {
     const dublicateUser = await User.findOne({ email })
 
     if (dublicateUser) {
-      throw new Conflict('This email already exist')
+      if (dublicateUser.verify) {
+        throw new Conflict('This email already exist')
+      }
+      await User.deleteOne({ email })
     }
+
+    const verificationToken = v4()
     const hashedPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10))
-    const newUser = await User.create({ password: hashedPassword, email, avatarURL })
+    const newUser = await User.create({ password: hashedPassword, email, avatarURL, verificationToken })
 
     const userAvatarFolder = path.join(avatarsDir, String(newUser._id))
     await fs.mkdir(userAvatarFolder)
+    await sendVerificationEmail({ email: newUser.email, verificationToken })
 
     res.json({
       status: 'created',
@@ -148,6 +164,43 @@ router.patch('/avatars', authenticate, uploadAvatars.single('avatar'), async (re
   } catch (error) {
     await fs.unlink(tempUpload)
     next(error)
+  }
+})
+
+router.get('/verify/:verificationToken', async (req, res, next) => {
+  try {
+    const { verificationToken } = req.params
+    const user = await User.findOne({ verificationToken, verify: false })
+    if (!user) {
+      throw new NotFound('User not found')
+    }
+    user.verificationToken = null
+    user.verify = true
+    await user.save()
+    res.json({ message: 'Verification successful' })
+  } catch (error) {
+    return next(error)
+  }
+})
+
+router.post('/verify', async (req, res, next) => {
+  try {
+    const { email } = req.body
+    if (!email) {
+      throw new BadRequest('missing required field email')
+    }
+    const user = await User.findOne({ email })
+    if (!user) {
+      throw new NotFound('User not found')
+    }
+    if (user.verify) {
+      throw new BadRequest('Verification has already been passed')
+    }
+
+    await sendVerificationEmail({ email, verificationToken: user.verificationToken })
+    res.json({ message: 'Verification email sent' })
+  } catch (error) {
+    return next(error)
   }
 })
 
